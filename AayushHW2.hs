@@ -5,7 +5,7 @@ import Control.Applicative
 
 makeErr2 :: String -> String -> Maybe Int -> [String] -> LogMessage
 makeErr2 n2 n3 Nothing l = Unknown ("E "++n2++" "++n3++" "++(unwords l))
-makeErr2 n2 n3 (Just a) l = (LogMessage (Error a) (read n2) (unwords l))
+makeErr2 n2 n3 (Just a) l = (LogMessage (Error (read n2)) a (unwords l))
 
 makeErr :: 	String -> [String] -> LogMessage
 makeErr n2 [] = Unknown ("E "++n2)
@@ -61,5 +61,3 @@ whatWentWrongSorted (_:l) = whatWentWrongSorted l
 
 whatWentWrong :: [LogMessage] -> [String]
 whatWentWrong t = (whatWentWrongSorted (inOrder (build t)))
-
-main = putStrLn (parse <$> readFile "sample.log")
