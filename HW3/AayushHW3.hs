@@ -4,7 +4,7 @@ chomp :: [a] -> Int -> Int -> [a]
 chomp [] _ _ = []
 chomp (b:l) m n
  | (m == n) = b: ( chomp l m 0 )
- | otherwise = (chomp l m (n+ 1))
+ | otherwise = chomp l m (n+ 1)
 
 skipLength :: [a] -> Int -> [[a]]
 skipLength [] _ = []
