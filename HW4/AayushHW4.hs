@@ -38,7 +38,7 @@ buildHelper p (Node x l t r)
  =  (Node x l t (buildHelper p r))
  | ((height r > height l) || (population r > population l))
  =  (Node x (buildHelper p l) t r)
- | otherwise = (Node (x+1) l t (buildHelper p r))
+ | otherwise = (Node (x+1) (buildHelper p l) t r)
 
 
 foldTree :: [a] -> Tree a
