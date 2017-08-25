@@ -13,7 +13,7 @@ eval (ExprT.Mul e1 e2) = (eval e1) * (eval e2)
 
 -- Exercise 2
 evalStr :: String -> Maybe Integer
-evalStr s = case (parseExp ExprT.Lit ExprT.Add ExprT.Mul s) of
+evalStr s = case parseExp ExprT.Lit ExprT.Add ExprT.Mul s of
   Just e -> Just (eval e)
   Nothing -> Nothing
 
@@ -56,7 +56,7 @@ testExp = parseExp lit add mul "(3 * -4) + 5"
 testInteger = testExp :: Maybe Integer -- -7
 testBool = testExp :: Maybe Bool       -- True
 testMM = testExp :: Maybe MinMax       -- 5
-testSat = testExp :: Maybe Mod7        --
+testSat = testExp :: Maybe Mod7        -- 0
 
 -- Exercise 5
 instance Expr Program where
@@ -65,7 +65,7 @@ instance Expr Program where
   mul e1 e2 = e2 ++ e1 ++ [StackVM.Mul]
 
 compile :: String -> Maybe Program
-compile s = (parseExp lit add mul s) :: Maybe Program
+compile = parseExp lit add mul
 
 -- Test
 testProg = stackVM (fromJust (compile "2+3*4")) -- Right (IVal 14)
