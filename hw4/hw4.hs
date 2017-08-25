@@ -36,13 +36,16 @@ foldTree = foldr insertBalanced Leaf
 insertBalanced :: a -> Tree a -> Tree a
 insertBalanced e Leaf = Node 0 Leaf e Leaf
 insertBalanced e (Node h l root r)
-  | ((height r) < (height l)) || ((nodes r) < (nodes l)) = (Node h l root (insertBalanced e r))
-  | ((height l) < (height r)) || ((nodes l) < (nodes r)) = (Node h (insertBalanced e l) root r)
+  | ((height r) < (height l)) || ((nodes r) < (completeSize h)) = (Node h l root (insertBalanced e r))
+  | ((height l) < (height r)) || ((nodes l) < (completeSize h)) = (Node h (insertBalanced e l) root r)
   | otherwise = (Node (h+1) (insertBalanced e l) root r)
 
 height :: Tree a -> Integer
 height Leaf = -1
 height (Node h _ _ _) = h
+
+completeSize :: Integer -> Integer
+completeSize n = (2 ^ n) - 1
 
 nodes :: Tree a -> Integer
 nodes Leaf = 0
@@ -59,6 +62,6 @@ map' f = foldr (\x y -> (f x) : y) []
 sieveSundaram :: Integer -> [Integer]
 sieveSundaram n = map (\x -> 2*x+1) ([1..n] \\ marked)
   where marked = filter (\x -> x <= n)
-          (map (\p -> case p of (a, b) -> a + b + 2 * a * b)
-            (filter (\p -> case p of (a, b) -> a + b + 2 * a * b <= n)
+          (map (\(a, b) -> a + b + 2 * a * b)
+            (filter (\(a, b) -> a + b + 2 * a * b <= n)
               [(i, j) | i <- [1..n], j <- [1..n], i <= j]))
