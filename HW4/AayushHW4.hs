@@ -36,7 +36,7 @@ buildHelper p Leaf = Node 0 Leaf p Leaf
 buildHelper p (Node x l t r)
  | ((height l > height r) || (population l > population r))
  =  (Node x l t (buildHelper p r))
- | ((height r > height l) || (population r > population l))
+ | ((height r > height l) || (population r > population l) || (population l < 2 ^ (height l + 1) - 1))
  =  (Node x (buildHelper p l) t r)
  | otherwise = (Node (x+1) (buildHelper p l) t r)
 
