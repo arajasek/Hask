@@ -39,15 +39,17 @@ nats = streamFromSeed (+1) 0
 interleaveStreams :: Stream a -> Stream a -> Stream a
 interleaveStreams (Cons x xs) ys = Cons x $ interleaveStreams ys xs
 
+iteratedInterleave f e = interleaveStreams (streamRepeat e) $ iteratedInterleave f (f e)
+
 -- Exercise 6
 x :: Stream Integer
 x = Cons 0 $ Cons 1 $ streamRepeat 0
 
 scalarMult :: Integer -> Stream Integer -> Stream Integer
-scalarMult n (Cons x xs) = Cons (n * x) $ scalarMult n xs
+scalarMult n s = streamMap (* n) s
 
 scalarDiv :: Stream Integer -> Integer -> Stream Integer
-scalarDiv (Cons x xs) n = Cons (div x n) $ scalarDiv xs n
+scalarDiv s n = streamMap (`div` n) s
 
 instance Num (Stream Integer) where
   fromInteger n = Cons n $ streamRepeat 0
@@ -74,8 +76,8 @@ instance Num Matrix where
 
 fibMatSeed = Matrix 1 1 1 0
 
-matElA :: Matrix -> Integer
-matElA (Matrix a _ _ _) = a
+matElB :: Matrix -> Integer
+matElB (Matrix _ b _ _) = b
 
 fib4 :: Integer -> Integer
-fib4 = matElA . (^) fibMatSeed
+fib4 = matElB . (^) fibMatSeed
