@@ -24,4 +24,4 @@ score inp
  where c = toLower inp
 
 scoreString :: String -> Score
-scoreString = foldr mappend mempty . map score
+scoreString = foldr (<>) mempty . map score

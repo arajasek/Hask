@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances, TypeSynonymInstances #-}
 import Data.Monoid
 import Sized
 import Scrabble
@@ -68,21 +68,9 @@ instance Buffer (JoinList (Score, Size) String) where
  fromString = foldr (+++) Empty . 
                 map (\l -> Single ((scoreString l), (Size 1)) l) . lines
 
- line n l
-  | (n >= intTag l) || (n < 0) = Nothing
-  | (n == 0) = Just (toString l)
+ line = indexJ
 
- line n (Append _ l r)
-  | (n < intTag l) = line n l
-  | otherwise = line (n - intTag l) r
-
- replaceLine n ln buf
-  | (n < 0) || (n > intTag buf) = buf
-  | (n == 0) = fromString ln
-
- replaceLine n ln (Append m l r)
-  | (n < intTag l) = (Append m (replaceLine n ln l) r)
-  | otherwise = (Append m l (replaceLine (n - intTag l) ln r))
+ replaceLine n ln buf = takeJ n buf +++ fromString ln +++ dropJ (n+1) buf
 
  numLines = intTag
 
@@ -90,12 +78,15 @@ instance Buffer (JoinList (Score, Size) String) where
  value (Single ((Score i), _) _) = i
  value (Append ((Score i), _) _ _) = i
 
-main = runEditor editor $ fromString unlines
+fromString' :: String -> (JoinList (Score, Size) String)
+fromString' = fromString
+
+main = runEditor editor $ fromString' $ unlines
          [ "This buffer is for notes you don't want to save, and for"
          , "evaluation of steam valve coefficients."
          , "To load a different file, type the character L followed"
          , "by the name of the file."
-         ]
+         ] 
 
 
 
