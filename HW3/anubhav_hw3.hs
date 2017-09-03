@@ -6,7 +6,7 @@ skips w = [[s | (f,s) <- zip [1..] w, f `mod` n == 0] | n <- [1..length w]]
 
 
 localMaxima :: [Integer] -> [Integer]
-localMaxima l = [a | (a,b,c) <- scanl (\(d,p,_) n -> (p,n,d<p && p>n)) (0,0,False) (tail l), c]
+localMaxima l = [a | (a,b,c) <- scanl (\(d,p,_) n -> (p, n, d < p && p > n)) (0,0,False) (tail l), c]
 
 -- localMaxima l = [a | (a,b,isPrevLocalMax) <- scanl (\(prevprev,prev,_) curr -> (prev,curr,prevprev<prev && prev>curr)) (0,0,False) (tail l), isPrevLocalMax]
 

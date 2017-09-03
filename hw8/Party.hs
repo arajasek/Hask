@@ -1,5 +1,7 @@
 import Employee
 import Data.Tree
+import Data.Monoid
+import Data.List
 
 glCons :: Employee -> GuestList -> GuestList
 glCons emp (GL ls fun) = GL (emp : ls) ((empFun emp) + fun)
@@ -13,7 +15,7 @@ moreFun gl1 gl2
 
 instance Monoid GuestList where
 	mempty  = GL [] 0
-	mappend = moreFun
+	mappend = \(GL ls1 f1) (GL ls2 f2) -> GL (ls1 ++ ls2) (f1 + f2)
 
 
 -- I think I can take out the accumulator?
@@ -22,29 +24,31 @@ treeFold fn acc (Node emp []) = fn emp []
 treeFold fn acc (Node emp ls) = fn emp (map (treeFold fn acc) ls)
 
 
--- Impossible since we don't know whether we took the previous boss
--- combineGLs :: Employee -> [GuestList] -> GuestList
--- combineGLs emp ls = map (\gl -> moreFun (glCons emp gl) gl) ls 
-
 -- (with, without)
-nextLevelHelper :: Employee -> (GuestList, GuestList) -> (GuestList, GuestList)
-nextLevelHelper emp (w, wo) = (glCons emp wo, w `mappend` wo)
+maxPair :: (GuestList, GuestList) -> GuestList
+maxPair (gl1, gl2) = moreFun gl1 gl2
 
 nextLevel :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
-nextLevel emp ls = (mconcat (map fst (map (nextLevelHelper emp) ls)), mconcat (map snd (map (nextLevelHelper emp) ls)))
-
-
-maxPair :: (GuestList, GuestList) -> GuestList
-maxPair (gl1, gl2) = gl1 `mappend` gl2
+nextLevel emp ls = (glCons emp (mconcat (map snd ls)), mconcat (map maxPair ls))
 
 maxFun :: Tree Employee -> GuestList
 maxFun te = maxPair (treeFold nextLevel (GL [] 0, GL [] 0) te)
 
 
+guestlistNumber :: GuestList -> String
+guestlistNumber (GL _ fun) = "Total fun: " ++ (show fun)
 
--- String -> IO ()
-stupid :: String -> IO ()
-stupid _ = putStrLn "test"
+guestlistNames :: [String] -> String
+guestlistNames names = foldr (\name acc -> name ++ "\n" ++ acc) "" names
+
+sortNames :: GuestList -> [String]
+sortNames (GL ls _) = sort (map (\emp -> (empName emp)) ls)
+
+glToString :: GuestList -> String
+glToString gl = (guestlistNumber gl) ++ "\n" ++ (guestlistNames (sortNames gl))
+
+process :: String -> IO ()
+process inputStr = putStrLn (glToString (maxFun (read inputStr)))
 
 main :: IO ()
-main = (readFile "company.txt") >>= stupid
+main = (readFile "company.txt") >>= process
