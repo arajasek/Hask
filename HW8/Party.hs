@@ -2,6 +2,7 @@ module Party where
 import Employee
 import Data.Tree
 import Data.Monoid
+import Data.List
 
 glCons :: Employee -> GuestList -> GuestList
 glCons emp (GL emps fun) = GL (emp:emps) (fun + empFun emp)
@@ -48,7 +49,7 @@ maxFun = (uncurry moreFun) . (treeFold1 nextLevel [(GL [] 0, GL [] 0)])
 -- Exercise 5
 
 formatGL :: GuestList -> String
-formatGL (GL xs fun) = "Total fun: " ++ (show fun) ++ "\n" ++ (foldr (++) "" (map ((++ "\n") . empName) xs))
+formatGL (GL xs fun) = "Total fun: " ++ (show fun) ++ "\n" ++ (foldr (++) "" (sort $ map ((++ "\n") . empName) xs))
 
 processFile :: String -> IO ()
 processFile = putStrLn . formatGL . maxFun . read
