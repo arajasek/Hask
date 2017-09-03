@@ -2,6 +2,7 @@
 import Employee
 import Data.Monoid
 import Data.Tree
+import Data.List
 
 --1
 
@@ -45,5 +46,12 @@ maxFun = (uncurry moreFun) . (fourFold nextLevel)
 
 --5
 
--- main :: IO ()
--- main = readFile "company.txt"
+gLtoString :: GuestList -> String 
+gLtoString (GL l f) = "Total fun:\n" ++ (show f) ++ "\n" ++ foldr (++) [] (sort (map ((++ "\n") . empName) l))
+
+main :: IO () 
+main = readFile "company.txt" >>= putStrLn . gLtoString . maxFun . read 
+
+
+
+
