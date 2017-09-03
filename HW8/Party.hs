@@ -44,3 +44,13 @@ nextLevel emp l = augmentGL emp $ foldr (<>) (mempty, mempty) l
 
 maxFun :: Tree Employee -> GuestList
 maxFun = (uncurry moreFun) . (treeFold1 nextLevel [(GL [] 0, GL [] 0)])
+
+-- Exercise 5
+
+formatGL :: GuestList -> String
+formatGL (GL xs fun) = "Total fun: " ++ (show fun) ++ "\n" ++ (foldr (++) "" (map ((++ "\n") . empName) xs))
+
+processFile :: String -> IO ()
+processFile = putStrLn . formatGL . maxFun . read
+
+main = readFile "company.txt" >>= processFile
