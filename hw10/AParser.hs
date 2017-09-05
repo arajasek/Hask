@@ -78,4 +78,31 @@ instance Applicative Parser where
   -- in the Typeclassopedia for the IO instance of Applicative, but the source code is not too
   -- helpful? https://hackage.haskell.org/package/base-4.10.0.0/docs/src/GHC.Base.html#%3C%2A%3E
   (Parser {runParser = p1}) <*> (Parser {runParser = p2})
-    = p1 >>=
+    = Parser (\input -> case (p1 input) of
+                          Nothing -> Nothing
+                          Just (f, rest) -> case (p2 rest) of
+                                              Nothing -> Nothing
+                                              Just (v, rest2) -> Just ((f v), rest2))
+  -- Essentially translated the do-notation from the definition of `ap` (linked above) to what
+  -- the assignment describes. It compiles!
+
+  -- OHHHHHHH I THINK IT MAKES SENSE. Taking their Employee parser example:
+  -- Emp <$> parseName <*> parsePhone :: Parser Employee
+  -- The 'pure' part ("Emp <$> ...") injects the Emp constructor into a Parser
+  -- The first ap ("... <*> parseName ...") will then take that Parser where `f`
+  -- (line 83 of the above defn) is the Emp constructor and 'compose' with the
+  -- name parser, so that `v` (line 85) is the parsed name. Then it applies f to v
+  -- so it (partially) constructs an Employee! Then that whole thing gets 'composed'
+  -- with the phone number parser, so now f is the partially applied constructor
+  -- and v is the phone string, and applying f to v gets our final Employee record.
+
+-- Exercise 3
+-- I assume we can use the helper functions they defined for us ?
+abParser :: Parser (Char, Char)
+abParser = (,) <$> (char 'a') <*> (char 'b')
+
+abParser_ :: Parser ()
+abParser_ = (\x y -> ()) <$> (char 'a') <*> (char 'b')
+
+intPair :: Parser [Integer]
+intPair = (\x y z -> [x, z]) <$> posInt <*> (char ' ') <*> posInt
