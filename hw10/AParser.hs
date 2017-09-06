@@ -102,7 +102,17 @@ abParser :: Parser (Char, Char)
 abParser = (,) <$> (char 'a') <*> (char 'b')
 
 abParser_ :: Parser ()
-abParser_ = (\x y -> ()) <$> (char 'a') <*> (char 'b')
+abParser_ = (\_ _ -> ()) <$> (char 'a') <*> (char 'b')
 
 intPair :: Parser [Integer]
-intPair = (\x y z -> [x, z]) <$> posInt <*> (char ' ') <*> posInt
+intPair = (\x _ z -> [x, z]) <$> posInt <*> (char ' ') <*> posInt
+
+-- Exercise 4
+instance Alternative Parser where
+  empty = Parser (\_ -> Nothing)
+  (Parser {runParser = p1}) <|> (Parser {runParser = p2})
+    = Parser (\input -> (p1 input) <|> (p2 input))
+
+-- Exercise 5
+intOrUpperCase :: Parser ()
+intOrUpperCase = ((\_ -> ()) <$> (satisfy isUpper)) <|> ((\_ -> ()) <$> posInt)
