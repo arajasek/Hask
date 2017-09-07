@@ -114,5 +114,8 @@ instance Alternative Parser where
     = Parser (\input -> (p1 input) <|> (p2 input))
 
 -- Exercise 5
+intParser :: Parser Integer
+intParser = ((\_ x -> x*(-1)) <$> (char '-') <*> posInt) <|> posInt
+
 intOrUpperCase :: Parser ()
-intOrUpperCase = ((\_ -> ()) <$> (satisfy isUpper)) <|> ((\_ -> ()) <$> posInt)
+intOrUpperCase = ((\_ -> ()) <$> (satisfy isUpper)) <|> ((\_ -> ()) <$> intParser)
