@@ -13,8 +13,8 @@ import Data.Char
 ------------------------------------------------------------
 
 zeroOrMore :: Parser a -> Parser [a]
-zeroOrMore p = liftA2 (:) p (zeroOrMore p) <|> pure [] -- use alternative to change apply's 'base case' from
-                                                       -- Nothing -> Nothing, to Nothing -> []
+zeroOrMore p = oneOrMore p <|> pure [] -- use alternative to change apply's 'base case' from
+                                       -- Nothing -> Nothing, to Nothing -> []
 
 oneOrMore :: Parser a -> Parser [a]
 oneOrMore p = liftA2 (:) p (zeroOrMore p) -- if initial p fails, will get Nothing
@@ -50,5 +50,8 @@ data SExpr = A Atom
 atom :: Parser Atom
 atom = liftA N posInt <|> liftA I ident
 
+combination :: Parser [SExpr]
+combination = (char '(') *> (oneOrMore parseSExpr) <* (char ')')
+
 parseSExpr :: Parser SExpr
-parseSExpr = spaces *> (liftA A atom <|> ((char '(') *> liftA Comb (oneOrMore parseSExpr) <* (char ')'))) <* spaces
+parseSExpr = spaces *> (liftA A atom <|> liftA Comb combination) <* spaces

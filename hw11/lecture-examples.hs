@@ -66,4 +66,4 @@ sequenceA (a:as) = liftA2 (:) a (sequenceA as) -- very similar to above; can ski
 -- ============================================================================
 replicateA :: Applicative f => Int -> f a -> f [a]
 replicateA 0 _ = pure []
-replicateA k elem = liftA2 (:) elem (replicateA (k - 1) elem)
+replicateA k elem = sequenceA (replicate k elem)
